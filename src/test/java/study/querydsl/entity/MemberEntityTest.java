@@ -194,7 +194,7 @@ public class MemberEntityTest {
     /**
      * team1에 속한 member들을 조회해라
      */
-//    @Disabled
+    @Disabled
     @Test
     void join() throws Exception {
 //        List<Member> members = query.selectFrom(member)
@@ -203,13 +203,13 @@ public class MemberEntityTest {
 //                .where(team.name.eq("team1"))
 //                .fetch();
 
-        List<Member> res = em.createQuery("select m from Member m left join m.team t on t.name = :teamName", Member.class)
-                .setParameter("teamName", "team1")
-                .getResultList();
+//        List<Member> res = em.createQuery("select m from Member m left join m.team t on t.name = :teamName", Member.class)
+//                .setParameter("teamName", "team1")
+//                .getResultList();
 
-        for (Member re : res) {
-            System.out.println(re.getUsername());
-        }
+//        for (Member re : res) {
+//            System.out.println(re.getUsername());
+//        }
 
 //        for (Member member : members) {
 //            System.out.println(member.getUsername());
@@ -225,6 +225,7 @@ public class MemberEntityTest {
         //세타조인 = 연관관계 없는 조인
         //먼저 member랑 team이랑 합친 다음에 where로 필터링
         //일단 다가져와서 다합치고(카타시안곱) 필터링하는데, DB가 알아서 최적화를 한다.
+        //기본적으로 아래처럼 from에 여러개 지정해주면 알아서 cross join 해준다.
         //세타조인은 join on 을 이용해서만 외부조인 가능
         //세타조인은 명시적으로 join을 호출하지 않는다.
 
@@ -240,6 +241,8 @@ public class MemberEntityTest {
                 .from(member, team)
                 .where(member.username.eq(team.name))
                 .fetch();
+
+        em.createQuery("select m, t from Member m, Team t");
 
         for (Member member : members) {
             System.out.println(member.getUsername());
@@ -259,11 +262,40 @@ public class MemberEntityTest {
     void onJoin() throws Exception {
         List<Tuple> res = query.select(member, team)
                 .from(member)
-                .leftJoin(member.team, team).on(team.name.eq("team1"))
+                .leftJoin(member.team, team).on(team.name.eq("팀1"))
                 .fetch();
+
         for (Tuple r : res) {
             System.out.println(r);
         }
+    }
+
+    /**
+     * 얘를 위의 thetaJoin과 비교해보라. outer join 하고싶으면 on 쓰라고 했던게 이거다.
+     * 연관관계 없는 join시 cross join 말고 inner join, outer join 쓰는 경우
+     */
+    @Disabled
+    @Test
+    void noRelationThetaOuterJoin() throws Exception {
+        //given
+        em.persist(new Member("team1", 20, null));
+        em.persist(new Member("team2", 20, null));
+
+        em.flush();
+        em.clear();
+
+        List<Tuple> tuples = query.select(member, team)
+            .from(member)
+            .leftJoin(team).on(member.username.eq(team.name))
+            .fetch();
+
+        em.flush();
+        em.clear();
+
+        em.createQuery("select m, t from Member m left join Team t on m.username = t.name")
+            .getResultList();
+
+        System.out.println();
     }
 
 }
