@@ -176,6 +176,7 @@ public class MemberEntityTest {
     /**
      * 팀의 이름과 각 팀의 평균 연령을 구해라.
      */
+    @Disabled
     @Test
     void group() throws Exception {
         List<Tuple> res = query.select(team.name, member.age.avg())
@@ -187,6 +188,81 @@ public class MemberEntityTest {
 
         for (int i = 0; i < res.size(); i++) {
             System.out.println(res.get(i).get(team.name) + ", " + res.get(i).get(member.age.avg()));
+        }
+    }
+
+    /**
+     * team1에 속한 member들을 조회해라
+     */
+//    @Disabled
+    @Test
+    void join() throws Exception {
+//        List<Member> members = query.selectFrom(member)
+//                .join(member.team, team)
+//                .leftJoin(member.team, team)
+//                .where(team.name.eq("team1"))
+//                .fetch();
+
+        List<Member> res = em.createQuery("select m from Member m left join m.team t on t.name = :teamName", Member.class)
+                .setParameter("teamName", "team1")
+                .getResultList();
+
+        for (Member re : res) {
+            System.out.println(re.getUsername());
+        }
+
+//        for (Member member : members) {
+//            System.out.println(member.getUsername());
+//        }
+    }
+
+    /**
+     * team과 이름이 같은 회원을 조회해라.
+     */
+    @Disabled
+    @Test
+    void thetaJoin() throws Exception {
+        //세타조인 = 연관관계 없는 조인
+        //먼저 member랑 team이랑 합친 다음에 where로 필터링
+        //일단 다가져와서 다합치고(카타시안곱) 필터링하는데, DB가 알아서 최적화를 한다.
+        //세타조인은 join on 을 이용해서만 외부조인 가능
+        //세타조인은 명시적으로 join을 호출하지 않는다.
+
+        //given
+        em.persist(new Member("team1", 20, null));
+        em.persist(new Member("team2", 20, null));
+
+        em.flush();
+        em.clear();
+
+        //when & then
+        List<Member> members = query.select(member)
+                .from(member, team)
+                .where(member.username.eq(team.name))
+                .fetch();
+
+        for (Member member : members) {
+            System.out.println(member.getUsername());
+        }
+    }
+
+    /**
+     * on - 조인 대상 필터링, 세타조인시에 외부조인 위해 사용
+     */
+
+    /**
+     * 팀 이름이 team1인 팀의 팀과 회원 전부를 가져오기
+     * JPQL: select m, t from Member m left join m.team t on t.name = 'team1'
+     */
+    @Disabled
+    @Test
+    void onJoin() throws Exception {
+        List<Tuple> res = query.select(member, team)
+                .from(member)
+                .leftJoin(member.team, team).on(team.name.eq("team1"))
+                .fetch();
+        for (Tuple r : res) {
+            System.out.println(r);
         }
     }
 
