@@ -8,13 +8,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import javassist.expr.Expr;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
@@ -248,23 +249,25 @@ public class MemberEntityTest {
     @Test
     void join() throws Exception {
         List<Member> members = query.selectFrom(member)
-                .join(member.team, team)
-                .leftJoin(member.team, team)
-                .where(team.name.eq("team1"))
-                .fetch();
+            .join(member.team, team)
+            .leftJoin(member.team, team)
+            .where(team.name.eq("team1"))
+            .fetch();
 
         em.clear();
 
         //아래 두 쿼리는 명확히 다른 것 on과 where의 차이 때문에
-        List<Member> res2 = em.createQuery("select m from Member m left join m.team t where t.name = :teamName", Member.class)
+        List<Member> res2 = em.createQuery("select m from Member m left join m.team t where t.name = :teamName",
+                Member.class)
             .setParameter("teamName", "team1")
             .getResultList();
 
         em.clear();
 
-        List<Member> res = em.createQuery("select m from Member m left join m.team t on t.name = :teamName", Member.class)
-                .setParameter("teamName", "team1")
-                .getResultList();
+        List<Member> res = em.createQuery("select m from Member m left join m.team t on t.name = :teamName",
+                Member.class)
+            .setParameter("teamName", "team1")
+            .getResultList();
 
         em.clear();
 
@@ -297,9 +300,9 @@ public class MemberEntityTest {
 
         //when & then
         List<Member> members = query.select(member)
-                .from(member, team)
-                .where(member.username.eq(team.name))
-                .fetch();
+            .from(member, team)
+            .where(member.username.eq(team.name))
+            .fetch();
 
         em.createQuery("select m, t from Member m, Team t");
 
@@ -313,16 +316,15 @@ public class MemberEntityTest {
      */
 
     /**
-     * 팀 이름이 team1인 팀의 팀과 회원 전부를 가져오기
-     * JPQL: select m, t from Member m left join m.team t on t.name = 'team1'
+     * 팀 이름이 team1인 팀의 팀과 회원 전부를 가져오기 JPQL: select m, t from Member m left join m.team t on t.name = 'team1'
      */
     @Disabled
     @Test
     void onJoin() throws Exception {
         List<Tuple> res = query.select(member, team)
-                .from(member)
-                .leftJoin(member.team, team).on(team.name.eq("팀1"))
-                .fetch();
+            .from(member)
+            .leftJoin(member.team, team).on(team.name.eq("팀1"))
+            .fetch();
 
         em.clear();
 
@@ -335,8 +337,8 @@ public class MemberEntityTest {
     }
 
     /**
-     * 얘를 위의 thetaJoin과 비교해보라. outer join 하고싶으면 on 쓰라고 했던게 이거다.
-     * 연관관계 없는 join시 cross join 말고 inner join, outer join 쓰는 경우
+     * 얘를 위의 thetaJoin과 비교해보라. outer join 하고싶으면 on 쓰라고 했던게 이거다. 연관관계 없는 join시 cross join 말고 inner join, outer join 쓰는
+     * 경우
      */
     @Disabled
     @Test
@@ -392,11 +394,8 @@ public class MemberEntityTest {
     }
 
     /**
-     * JPA SubQuery는 select, where 에서만 허용한다. from은 허용하지 않는다. (JPA의 한계)
-     * from절에서 subQuery 써야할 때 해결법
-     * 1. join으로 변경 (높은 확률로 가능)
-     * 2. 쿼리 분리
-     * 3. nativeQuery 사용
+     * JPA SubQuery는 select, where 에서만 허용한다. from은 허용하지 않는다. (JPA의 한계) from절에서 subQuery 써야할 때 해결법 1. join으로 변경 (높은 확률로
+     * 가능) 2. 쿼리 분리 3. nativeQuery 사용
      */
 
     //서브쿼리. 나이가 가장 많은 회원 조회
@@ -597,8 +596,7 @@ public class MemberEntityTest {
     }
 
     /**
-     * projection의 setter 방식.
-     * 먼저 기본 생성자를 호출한 뒤에 setter로 값 세팅
+     * projection의 setter 방식. 먼저 기본 생성자를 호출한 뒤에 setter로 값 세팅
      */
     @Disabled
     @Test
@@ -626,8 +624,7 @@ public class MemberEntityTest {
     }
 
     /**
-     * 생성자 호출 방식. 일반적인 JPQL로는 이방식밖에 안된다.
-     * 하지만 필드가 더 들어가도, 런타임에 에러를 잡아낸다.
+     * 생성자 호출 방식. 일반적인 JPQL로는 이방식밖에 안된다. 하지만 필드가 더 들어가도, 런타임에 에러를 잡아낸다.
      */
     @Disabled
     @Test
@@ -655,16 +652,14 @@ public class MemberEntityTest {
                     JPAExpressions
                         .select(subMember.age.max())
                         .from(subMember)
-                , "age")
+                    , "age")
             ))
             .from(member)
             .fetch();
     }
 
     /**
-     * @QueryProjection 어노테이션을 붙여야하고
-     * dto자체가 querydsl에 대한 의존성이 생긴다.
-     * 하지만 컴파일타임에 에러를 찾아낼 수 있다는게 장점
+     * @QueryProjection 어노테이션을 붙여야하고 dto자체가 querydsl에 대한 의존성이 생긴다. 하지만 컴파일타임에 에러를 찾아낼 수 있다는게 장점
      */
     @Disabled
     @Test
@@ -676,22 +671,19 @@ public class MemberEntityTest {
     }
 
     /**
-     * 동적 쿼리
-     * 1. BooleanBuilder
-     * 2. Where 다중 파라미터
-     * parameter의 값이 null이냐 아니냐에 따라서 동적으로 query가 변해야한다.
-     * null이면 조건이 빠져야한다.
+     * 동적 쿼리 1. BooleanBuilder 2. Where 다중 파라미터 parameter의 값이 null이냐 아니냐에 따라서 동적으로 query가 변해야한다. null이면 조건이 빠져야한다.
      */
+    @Disabled
     @Test
     void dynamicQueryBooleanBuilder() {
         String usernameParam = "member1";
         Integer ageParam = 10;
 
-        List<Member> res = searchMember(usernameParam, ageParam);
+        List<Member> res = searchMemberBoolean(usernameParam, ageParam);
         System.out.println();
     }
 
-    private List<Member> searchMember(String usernameParam, Integer ageParam) {
+    private List<Member> searchMemberBoolean(String usernameParam, Integer ageParam) {
         BooleanBuilder builder = new BooleanBuilder(); //여기에 초기값 가능
         if (usernameParam != null) {
             builder.and(member.username.eq(usernameParam));
@@ -704,6 +696,148 @@ public class MemberEntityTest {
             .selectFrom(member)
             .where(builder)
             .fetch();
+    }
+
+    /**
+     * 재사용성이 폭발적으로 증가.
+     */
+    @Disabled
+    @Test
+    void dynamicQueryWhere() {
+        String usernameParam = "member1";
+        Integer ageParam = 10;
+
+        List<Member> res = searchMemberWhere(usernameParam, ageParam);
+    }
+
+    private List<Member> searchMemberWhere(String usernameParam, Integer ageParam) {
+        return query
+            .selectFrom(member)
+            .where(usernameEq(usernameParam), ageEq(ageParam))
+//            .where(allEq(usernameParam, ageParam))
+            .fetch();
+    }
+
+    private BooleanExpression usernameEq(String usernameParam) {
+        return usernameParam != null ? member.username.eq(usernameParam) : null;
+    }
+
+    private BooleanExpression ageEq(Integer ageParam) {
+        return ageParam != null ? member.age.eq(ageParam) : null;
+    }
+
+    //이런식으로 조립이 가능하다.
+
+    /**
+     * 여러개 조건을 합쳐서 하나의 조건으로 만들기 매우 유용하다.
+     */
+    private BooleanExpression allEq(String usernameParam, Integer ageParam) {
+        return usernameEq(usernameParam).and(ageEq(ageParam));
+    }
+
+    /**
+     * 배치 쿼리
+     */
+    @Disabled
+    @Test
+    void batch() throws Exception {
+        List<Member> fetch = query.selectFrom(member)
+            .fetch();
+
+        for (Member fetch1 : fetch) {
+            System.out.println(fetch1.getUsername());
+        }
+
+        long count = query
+            .update(member)
+            .set(member.username, "비회원")
+            .where(member.age.lt(20))
+            .execute();
+
+        em.createQuery("update Member m set m.username='비회원' where m.age < 20").executeUpdate();
+
+        em.flush();
+        em.clear();
+
+        List<Member> members = query.selectFrom(member)
+            .fetch();
+
+        for (Member member1 : members) {
+            System.out.println(member1.getUsername());
+        }
+    }
+
+    @Disabled
+    @Test
+    void batchAdd() throws Exception {
+        long execute = query
+            .update(member)
+            .set(member.age, member.age.add(-1))
+            .execute();
+    }
+
+    @Disabled
+    @Test
+    void batchMutliply() throws Exception {
+        long execute = query
+            .update(member)
+            .set(member.age, member.age.multiply(10))
+            .execute();
+    }
+
+    @Disabled
+    @Test
+    void batchDelete() throws Exception {
+        long execute = query
+            .delete(member)
+            .where(member.age.gt(20))
+            .execute();
+
+        em.createQuery("delete from Member m where m.age <= 20").executeUpdate();
+    }
+
+    /**
+     * SQL Function 호출
+     */
+    @Disabled
+    @Test
+    void sqlFunction1() throws Exception {
+        List<String> names = query
+            .select(
+                Expressions.stringTemplate("function('replace', {0}, {1}, {2})", member.username, "member", "M")
+            ).from(member)
+            .fetch();
+
+        //Native Query = select replace(m.username, 'member', 'M') as rep from member as m
+
+        List<String> resultList = em.createQuery("select function('replace', m.username, 'member', 'M') from Member m",
+                String.class)
+            .getResultList();
+
+        for (String name : names) {
+            System.out.println("name = " + name);
+        }
+
+        for (String s : resultList) {
+            System.out.println("s = " + s);
+        }
+    }
+
+    //ANSI 표준에 등록된 function들은 기본적으로 내장하고 있는 것이 많음.
+    @Disabled
+    @Test
+    void sqlFunction2() throws Exception {
+        List<String> names = query
+            .select(member.username)
+            .from(member)
+//            .where(member.username.eq(
+//                Expressions.stringTemplate("function('lower', {0})", member.username))
+            .where(member.username.eq(member.username.lower())
+            ).fetch();
+
+        for (String name : names) {
+            System.out.println("name = " + name);
+        }
     }
 
 }
