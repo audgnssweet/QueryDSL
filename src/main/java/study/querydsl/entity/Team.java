@@ -19,16 +19,16 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter
 @Getter
-@Table(name = "TEAM")
+@Table(name = "team")
 @Entity
 public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TEAM_ID")
-    private long id;
+    @Column(name = "team_id")
+    private Long id;
 
-    @Column(name = "NAME")
+    @Column(name = "name")
     private String name;
 
     @OneToMany(mappedBy = "team")

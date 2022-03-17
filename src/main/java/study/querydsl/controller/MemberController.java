@@ -8,8 +8,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import study.querydsl.dto.MemberCreateDto;
+import study.querydsl.dto.MemberDto;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.paging.QuerySort;
@@ -22,6 +27,16 @@ public class MemberController {
 
     private final MemberJpaQueryRepository memberJpaQueryRepository;
     private final MemberService memberService;
+
+    @PostMapping("/v1/members")
+    public MemberDto createMember(@RequestBody MemberCreateDto req) {
+        return memberService.createMember(req);
+    }
+
+    @GetMapping("/v1/members/{member-id}")
+    public MemberDto getMemberDetail(@PathVariable("member-id") Long memberId) {
+        return memberService.findById(memberId);
+    }
 
     @GetMapping("/v1/members")
     public List<MemberTeamDto> searchMember(MemberSearchCondition condition) {

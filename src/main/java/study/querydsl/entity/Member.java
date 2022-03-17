@@ -16,23 +16,23 @@ import lombok.ToString;
 @ToString(of = {"id", "username", "age"})
 @Setter
 @Getter
-@Table(name = "MEMBER")
+@Table(name = "member")
 @Entity
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MEMBER_ID")
-    private long id;
+    @Column(name = "member_id")
+    private Long id;
 
-    @Column(name = "USERNAME")
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "AGE", nullable = false)
+    @Column(name = "age", nullable = false, columnDefinition = "tinyint")
     private int age;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEAM_ID")
+    @JoinColumn(name = "team_id")
     private Team team;
 
     protected Member() {}
