@@ -11,7 +11,7 @@ import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.entity.Member;
 import study.querydsl.paging.QuerySort;
-import study.querydsl.repository.MemberRepository;
+import study.querydsl.repository.member.MemberRepository;
 
 @RequiredArgsConstructor
 @Service

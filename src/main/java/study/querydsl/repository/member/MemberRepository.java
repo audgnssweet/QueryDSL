@@ -1,4 +1,4 @@
-package study.querydsl.repository;
+package study.querydsl.repository.member;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

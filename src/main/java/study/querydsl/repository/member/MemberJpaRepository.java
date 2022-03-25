@@ -1,4 +1,4 @@
-package study.querydsl.repository;
+package study.querydsl.repository.member;
 
 import static study.querydsl.entity.QMember.member;
 

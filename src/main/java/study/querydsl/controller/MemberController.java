@@ -4,9 +4,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +15,7 @@ import study.querydsl.dto.MemberDto;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.paging.QuerySort;
-import study.querydsl.repository.MemberJpaQueryRepository;
+import study.querydsl.repository.member.MemberJpaQueryRepository;
 import study.querydsl.service.MemberService;
 
 @RequiredArgsConstructor
