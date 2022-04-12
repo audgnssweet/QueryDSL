@@ -17,4 +17,10 @@ public class ManyController {
 		manyService.doSomething(manyId);
 	}
 
+	@GetMapping("/test2")
+	public void test() {
+		manyService.doSomething2();
+	}
+
+
 }

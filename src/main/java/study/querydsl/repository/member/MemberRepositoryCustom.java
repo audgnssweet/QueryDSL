@@ -22,4 +22,6 @@ public interface MemberRepositoryCustom {
     Page<Member> searchPageQueryDSL(MemberSearchCondition condition, Pageable pageable, List<QuerySort> sorts);
 
     Page<MemberTeamDto> searchPageQueryDSLCount(MemberSearchCondition condition, Pageable pageable);
+
+    Member findMemberByIdFetchTeamAndTeamDetail(Long id);
 }

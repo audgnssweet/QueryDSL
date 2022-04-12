@@ -20,34 +20,26 @@ import lombok.ToString;
 @Entity
 public class Member {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "member_id")
+	private Long id;
 
-    @Column(name = "username")
-    private String username;
+	@Column(name = "username")
+	private String username;
 
-    @Column(name = "age", nullable = false, columnDefinition = "tinyint")
-    private int age;
+	@Column(name = "age", nullable = false, columnDefinition = "tinyint")
+	private int age;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "team_id")
+	private Team team;
 
-    protected Member() {}
+	protected Member() {
+	}
 
-    public Member(String username, int age, Team team) {
-        this.username = username;
-        this.age = age;
-        if (team != null) {
-            changeTeam(team);
-        }
-    }
-
-    public void changeTeam(Team team) {
-        this.team = team;
-        team.getMembers().add(this);
-    }
-
+	public Member(String username, int age, Team team) {
+		this.username = username;
+		this.age = age;
+	}
 }

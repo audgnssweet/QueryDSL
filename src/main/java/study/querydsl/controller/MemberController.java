@@ -22,32 +22,37 @@ import study.querydsl.service.MemberService;
 @RestController
 public class MemberController {
 
-    private final MemberJpaQueryRepository memberJpaQueryRepository;
-    private final MemberService memberService;
+	private final MemberJpaQueryRepository memberJpaQueryRepository;
+	private final MemberService memberService;
 
-    @PostMapping("/v1/members")
-    public MemberDto createMember(@RequestBody MemberCreateDto req) {
-        return memberService.createMember(req);
-    }
+	@PostMapping("/v1/members")
+	public MemberDto createMember(@RequestBody MemberCreateDto req) {
+		return memberService.createMember(req);
+	}
 
-    @GetMapping("/v1/members/{member-id}")
-    public MemberDto getMemberDetail(@PathVariable("member-id") Long memberId) {
-        return memberService.findById(memberId);
-    }
+	@GetMapping("/v1/members/{member-id}")
+	public MemberDto getMemberDetail(@PathVariable("member-id") Long memberId) {
+		return memberService.findById(memberId);
+	}
 
-    @GetMapping("/v1/members")
-    public List<MemberTeamDto> searchMember(MemberSearchCondition condition) {
-        return memberJpaQueryRepository.search(condition);
-    }
+	@GetMapping("/v1/members")
+	public List<MemberTeamDto> searchMember(MemberSearchCondition condition) {
+		return memberJpaQueryRepository.search(condition);
+	}
 
-    @GetMapping("/v2/members")
-    public Page<MemberTeamDto> searchMemberV2(
-        MemberSearchCondition condition,
-        @RequestParam(name = "sorts", required = false) List<QuerySort> sorts,
-        @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-        @RequestParam(name = "size", required = false, defaultValue = "3") int size
-    ) {
-        return memberService.getMembersWithTeam(condition, PageRequest.of(offset, size), sorts);
-    }
+	@GetMapping("/v2/members")
+	public Page<MemberTeamDto> searchMemberV2(
+		MemberSearchCondition condition,
+		@RequestParam(name = "sorts", required = false) List<QuerySort> sorts,
+		@RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+		@RequestParam(name = "size", required = false, defaultValue = "3") int size
+	) {
+		return memberService.getMembersWithTeam(condition, PageRequest.of(offset, size), sorts);
+	}
+
+	@GetMapping("/v1/members/fetch")
+	public void fetchMember(@RequestParam("memberId") Long memberId) {
+		memberService.findByIdFetch(memberId);
+	}
 
 }

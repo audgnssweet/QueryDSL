@@ -33,4 +33,9 @@ public class MemberService {
         Member member = memberRepository.save(new Member(req.getUsername(), req.getAge(), null));
         return new MemberDto(member.getUsername(), member.getAge());
     }
+
+    public void findByIdFetch(Long id) {
+        Member member = memberRepository.findMemberByIdFetchTeamAndTeamDetail(id);
+        System.out.println();
+    }
 }
